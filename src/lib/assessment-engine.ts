@@ -14,6 +14,13 @@ export interface AssessmentInput {
   visitorName: string;
   visitorRole: string;
   visitPurpose: string;
+  // 后勤细节
+  meetingRoom?: string;
+  mealRequired?: boolean;
+  duration?: string;
+  visitorCount?: number;
+  hostName?: string;
+  hostFeishuId?: string;
 }
 
 export interface DimensionScore {

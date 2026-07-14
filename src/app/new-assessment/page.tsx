@@ -37,9 +37,15 @@ export default function NewAssessmentPage() {
     visitorName: "",
     visitorRole: "",
     visitPurpose: "",
+    meetingRoom: "",
+    mealRequired: false,
+    duration: "",
+    visitorCount: 1,
+    hostName: "",
+    hostFeishuId: "",
   });
 
-  const update = (field: string, value: string) =>
+  const update = (field: string, value: string | number | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleSubmit = async () => {
@@ -61,7 +67,13 @@ export default function NewAssessmentPage() {
     }
   };
 
-  const isValid = Object.values(form).every((v) => v.trim().length > 0);
+  const isValid =
+    form.businessUnit.trim().length > 0 &&
+    form.organizationType.trim().length > 0 &&
+    form.organizationName.trim().length > 0 &&
+    form.visitorName.trim().length > 0 &&
+    form.visitorRole.trim().length > 0 &&
+    form.visitPurpose.trim().length > 0;
 
   return (
     <div className="flex h-screen flex-col">
@@ -190,6 +202,94 @@ export default function NewAssessmentPage() {
                 />
               </section>
 
+              {/* Section 04 — Visit Logistics */}
+              <section>
+                <div className="flex items-baseline gap-3 mb-4">
+                  <span className="font-serif text-4xl font-bold text-muted-foreground/30">
+                    04
+                  </span>
+                  <div>
+                    <h2 className="text-base font-semibold">Visit Logistics</h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Meeting room, duration, meal arrangement, and host info
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <select
+                      value={form.meetingRoom}
+                      onChange={(e) => update("meetingRoom", e.target.value)}
+                      className="bg-muted border-none rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 appearance-none"
+                    >
+                      <option value="">Meeting room...</option>
+                      <option value="Conference Room A-301">Conference Room A-301</option>
+                      <option value="Executive Meeting Room B-501">Executive Meeting Room B-501</option>
+                      <option value="Seminar Room C-201">Seminar Room C-201</option>
+                      <option value="Secure Meeting Room D-102">Secure Meeting Room D-102</option>
+                      <option value="Board Room E-801">Board Room E-801</option>
+                      <option value="Conference Room F-402">Conference Room F-402</option>
+                      <option value="Lobby Reception Area">Lobby Reception Area</option>
+                    </select>
+                    <select
+                      value={form.duration}
+                      onChange={(e) => update("duration", e.target.value)}
+                      className="bg-muted border-none rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 appearance-none"
+                    >
+                      <option value="">Duration...</option>
+                      <option value="30 minutes">30 minutes</option>
+                      <option value="1 hour">1 hour</option>
+                      <option value="1.5 hours">1.5 hours</option>
+                      <option value="2 hours">2 hours</option>
+                      <option value="2.5 hours">2.5 hours</option>
+                      <option value="3 hours">3 hours</option>
+                      <option value="Half day">Half day</option>
+                      <option value="Full day">Full day</option>
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex items-center gap-3 bg-muted rounded-md px-3 py-2.5">
+                      <span className="text-sm">Meal required</span>
+                      <button
+                        type="button"
+                        onClick={() => setForm((prev) => ({ ...prev, mealRequired: !prev.mealRequired }))}
+                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full transition-colors ${form.mealRequired ? "bg-primary" : "bg-muted-foreground/20"}`}
+                      >
+                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform mt-0.5 ${form.mealRequired ? "translate-x-4 ml-0.5" : "translate-x-0.5"}`} />
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2 bg-muted rounded-md px-3 py-2.5">
+                      <span className="text-sm whitespace-nowrap">Visitors</span>
+                      <input
+                        type="number"
+                        min={1}
+                        max={50}
+                        value={form.visitorCount}
+                        onChange={(e) => setForm((prev) => ({ ...prev, visitorCount: parseInt(e.target.value) || 1 }))}
+                        className="w-16 bg-transparent text-sm text-right focus:outline-none"
+                      />
+                      <span className="text-sm text-muted-foreground">person(s)</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      placeholder="Host name (our team lead)"
+                      value={form.hostName}
+                      onChange={(e) => update("hostName", e.target.value)}
+                      className="bg-muted border-none rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground/40"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Host Feishu ID (e.g., ou_xxx)"
+                      value={form.hostFeishuId}
+                      onChange={(e) => update("hostFeishuId", e.target.value)}
+                      className="bg-muted border-none rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground/40"
+                    />
+                  </div>
+                </div>
+              </section>
+
               {/* Actions */}
               <div className="flex items-center gap-3 pt-2">
                 <button
@@ -232,7 +332,7 @@ export default function NewAssessmentPage() {
   );
 }
 
-function PreviewScore({ form }: { form: Record<string, string> }) {
+function PreviewScore({ form }: { form: Record<string, string | number | boolean> }) {
   const { score, level, factors } = estimateRisk(form);
 
   return (
@@ -304,7 +404,7 @@ function PreviewScore({ form }: { form: Record<string, string> }) {
   );
 }
 
-function estimateRisk(form: Record<string, string>) {
+function estimateRisk(form: Record<string, string | number | boolean>) {
   const orgScores: Record<string, number> = {
     "International Press Outlet": 8,
     "Government Agency": 9,
@@ -326,10 +426,14 @@ function estimateRisk(form: Record<string, string>) {
     "General Office & Facilities": 1,
   };
 
-  const orgScore = orgScores[form.organizationType] || 5;
-  const buScore = buScores[form.businessUnit] || 5;
+  const orgType = String(form.organizationType || "");
+  const businessUnit = String(form.businessUnit || "");
+  const visitPurpose = String(form.visitPurpose || "");
 
-  const lower = form.visitPurpose.toLowerCase();
+  const orgScore = orgScores[orgType] || 5;
+  const buScore = buScores[businessUnit] || 5;
+
+  const lower = visitPurpose.toLowerCase();
   const highKw = [
     "interview", "algorithm", "data", "investigat", "lab", "server",
     "moderation", "training data", "regulatory",
@@ -351,9 +455,9 @@ function estimateRisk(form: Record<string, string>) {
 
   const factors: string[] = [];
   if (orgScore >= 7)
-    factors.push(`${form.organizationType || "Organization"} classified as high sensitivity`);
+    factors.push(`${orgType || "Organization"} classified as high sensitivity`);
   if (buScore >= 7)
-    factors.push(`${form.businessUnit || "Business unit"} has elevated sensitivity`);
+    factors.push(`${businessUnit || "Business unit"} has elevated sensitivity`);
   if (purposeScore >= 6)
     factors.push("Visit purpose contains elevated-risk indicators");
   if (highMatches.length > 0)

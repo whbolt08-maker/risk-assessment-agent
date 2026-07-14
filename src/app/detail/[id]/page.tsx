@@ -13,6 +13,11 @@ import {
   Send,
   BookOpen,
   AlertTriangle,
+  MapPin,
+  Users,
+  UtensilsCrossed,
+  Timer,
+  MessageSquare,
 } from "lucide-react";
 
 interface DimensionScore {
@@ -45,6 +50,12 @@ interface Assessment {
     visitorName: string;
     visitorRole: string;
     visitPurpose: string;
+    meetingRoom?: string;
+    mealRequired?: boolean;
+    duration?: string;
+    visitorCount?: number;
+    hostName?: string;
+    hostFeishuId?: string;
   };
   dimensionScores: DimensionScore[];
   overallScore: number;
@@ -221,6 +232,71 @@ export default function DetailPage() {
                     &ldquo;{assessment.input.visitPurpose}&rdquo;
                   </blockquote>
                 </div>
+              </div>
+            </div>
+
+            {/* Visit Logistics */}
+            <div className="bg-card rounded-lg shadow-card p-5">
+              <h3 className="font-serif text-base font-semibold mb-4">
+                Visit Logistics
+              </h3>
+              <div className="space-y-3">
+                {assessment.input.meetingRoom && (
+                  <div className="flex items-center gap-3">
+                    <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Meeting Room</p>
+                      <p className="text-sm font-medium">{assessment.input.meetingRoom}</p>
+                    </div>
+                  </div>
+                )}
+                {assessment.input.duration && (
+                  <div className="flex items-center gap-3">
+                    <Timer className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Duration</p>
+                      <p className="text-sm font-medium">{assessment.input.duration}</p>
+                    </div>
+                  </div>
+                )}
+                {assessment.input.visitorCount !== undefined && (
+                  <div className="flex items-center gap-3">
+                    <Users className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Visitors</p>
+                      <p className="text-sm font-medium">{assessment.input.visitorCount} person(s)</p>
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center gap-3">
+                  <UtensilsCrossed className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Meal Arrangement</p>
+                    <p className="text-sm font-medium">{assessment.input.mealRequired ? "Yes — meal required" : "No meal needed"}</p>
+                  </div>
+                </div>
+                {assessment.input.hostName && (
+                  <div className="flex items-center gap-3 pt-2 border-t border-border">
+                    <MessageSquare className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-xs text-muted-foreground">Our Team Host</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium">{assessment.input.hostName}</p>
+                        {assessment.input.hostFeishuId && (
+                          <a
+                            href={`https://applink.feishu.cn/client/chat/open?openId=${assessment.input.hostFeishuId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-primary hover:underline bg-primary/5 px-2 py-0.5 rounded"
+                          >
+                            <MessageSquare className="w-3 h-3" />
+                            Chat on Feishu
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
