@@ -2,15 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   FilePlus,
   History,
   FileSearch,
   ShieldCheck,
-  Sun,
-  Moon,
 } from "lucide-react";
 
 const navItems = [
@@ -20,41 +17,12 @@ const navItems = [
   { href: "/detail/RA-2024-0087", label: "Detail", icon: FileSearch },
 ];
 
-function ThemeToggle() {
-  const [dark, setDark] = useState(false);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    const isDark = stored === "dark";
-    setDark(isDark);
-    document.documentElement.classList.toggle("dark", isDark);
-  }, []);
-
-  const toggle = () => {
-    const next = !dark;
-    setDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("theme", next ? "dark" : "light");
-  };
-
-  return (
-    <button
-      onClick={toggle}
-      className="flex items-center gap-2 px-3 py-2 rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-foreground text-sm transition-colors w-full"
-      title="Toggle theme"
-    >
-      {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-      {dark ? "Light Mode" : "Dark Mode"}
-    </button>
-  );
-}
-
 export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-56 shrink-0 bg-sidebar overflow-y-auto border-r border-sidebar-border flex flex-col">
-      <nav className="p-3 space-y-0.5 flex-1">
+    <aside className="w-56 shrink-0 bg-sidebar overflow-y-auto border-r border-sidebar-border">
+      <nav className="p-3 space-y-0.5">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -77,9 +45,6 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <div className="p-3 border-t border-sidebar-border">
-        <ThemeToggle />
-      </div>
     </aside>
   );
 }
