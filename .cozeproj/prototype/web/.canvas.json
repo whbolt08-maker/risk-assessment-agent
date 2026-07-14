@@ -1,0 +1,36 @@
+{
+  "elements": [
+    {
+      "type": "html",
+      "options": {
+        "path": ".cozeproj/prototype/web/home.html"
+      },
+      "title": "仪表盘",
+      "size": "web"
+    },
+    {
+      "type": "html",
+      "options": {
+        "path": ".cozeproj/prototype/web/new-assessment.html"
+      },
+      "title": "新建评估",
+      "size": "web"
+    },
+    {
+      "type": "html",
+      "options": {
+        "path": ".cozeproj/prototype/web/history.html"
+      },
+      "title": "评估历史",
+      "size": "web"
+    },
+    {
+      "type": "html",
+      "options": {
+        "path": ".cozeproj/prototype/web/detail.html"
+      },
+      "title": "评估详情",
+      "size": "web"
+    }
+  ]
+}

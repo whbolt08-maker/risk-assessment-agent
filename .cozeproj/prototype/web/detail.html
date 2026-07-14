@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- 字体：Playfair Display 用于标题，Noto Serif SC 用于中文标题 -->
+  <link href="https://lf-code-agent.coze.cn/obj/x-ai-cn/fonts/google/css2?family=Playfair+Display:wght@400;600;700;900&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+
+  <script src="https://lf-code-agent.coze.cn/obj/x-ai-cn/cdn/jquery/jquery-3.7.1.min.js"></script>
+  <script src="https://lf-code-agent.coze.cn/obj/x-ai-cn/cdn/lucide/lucide-1.11.0.min.js"></script>
+  <script src="https://lf-code-agent.coze.cn/obj/x-ai-cn/cdn/tailwindcss/tailwindcss-browser-4.2.4.min.js"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      /* === 品牌色（杂志风：黑白克制） === */
+      --color-primary:              #111111;
+      --color-primary-container:    #E8E4DB;
+      --color-on-primary:           #F4F1EA;
+      /* === 背景 / 表面（温暖纸张色阶） === */
+      --color-background:                 #F4F1EA;
+      --color-surface-container-lowest:   #F4F1EA;
+      --color-surface:                    #F4F1EA;
+      --color-surface-container:          #EDE9E0;
+      --color-surface-container-high:     #E5E0D5;
+      --color-surface-container-highest:  #DDD7CB;
+      /* === 文字 === */
+      --color-on-surface:           #111111;
+      --color-on-surface-variant:   #6B665E;
+      /* === 功能色（低饱和度，配合杂志气质） === */
+      --color-success:  #2D5016;
+      --color-error:    #8B2500;
+      --color-warning:  #8B6914;
+      /* === 边框 === */
+      --color-outline:          #D8D1C4;
+      --color-outline-variant:  #E5E0D5;
+      /* === 圆角（杂志风偏严肃，小圆角） === */
+      --radius-sm:   0.125rem;
+      --radius-md:   0.25rem;
+      --radius-lg:   0.375rem;
+      --radius-xl:   0.5rem;
+      --radius-2xl:  0.75rem;
+      --radius-full: 9999px;
+      /* === 阴影（克制柔和） === */
+      --shadow-card:   0 2px 8px rgba(0,0,0,0.10);
+      --shadow-float:  0 10px 25px rgba(0,0,0,0.08);
+      --shadow-dialog: 0 25px 50px rgba(0,0,0,0.12);
+      /* === 字体 === */
+      --font-serif: "Playfair Display", "Noto Serif SC", Georgia, serif;
+      --font-sans: system-ui, -apple-system, sans-serif;
+    }
+  </style>
+
+  <!-- 图片兜底 -->
+  <script>
+    document.addEventListener('error', function (e) {
+      const img = e.target;
+      if (img.tagName !== 'IMG' || img.dataset.fallback) return;
+      img.dataset.fallback = '1';
+      const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const cat = img.getAttribute('data-category') || '其他';
+      const alt = img.getAttribute('alt') || '';
+      const label = esc(alt.length > 8 ? alt.slice(0, 8) + '…' : alt);
+      const icons = { '人物': '👤', '自然风景': '🏞', '动物': '🐾', '建筑城市': '🏙', '运动体育': '⚽', '交通工具': '🚗', '食物': '🍽', '服饰时尚': '👗', '商业科技': '💼', '游戏娱乐': '🎮', '艺术': '🎨', '其他': '🖼' };
+      const icon = icons[cat] || '🖼';
+      const w = img.width || 400, h = img.height || 300;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="100%" height="100%" fill="%23f3f4f6"/><text x="50%" y="45%" text-anchor="middle" font-size="${Math.min(w, h) * 0.18}" dominant-baseline="central">${icon}</text><text x="50%" y="68%" text-anchor="middle" font-size="${Math.min(w, h) * 0.07}" fill="%239ca3af" font-family="system-ui,sans-serif" dominant-baseline="central">${label}</text></svg>`;
+      img.src = 'data:image/svg+xml,' + svg;
+    }, true);
+  </script>
+</head>
+
+<body class="bg-background text-on-surface font-sans">
+
+  <!-- @nav:start 导航组件，不需要的页面则不要复制此段（从 @nav:start 到 @nav:end） -->
+  <header class="bg-surface sticky top-0 z-40 h-14 flex items-center justify-between px-6 border-b border-outline/30">
+    <div class="flex items-center gap-3">
+      <i data-lucide="shield-check" class="w-5 h-5 text-primary"></i>
+      <span class="font-serif font-bold text-lg tracking-tight">Risk Assessment Agent</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center text-xs font-medium">初</div>
+        <span class="text-sm text-on-surface-variant">小初</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex" style="height: calc(100vh - 3.5rem)">
+    <aside class="w-56 shrink-0 bg-surface-container overflow-y-auto border-r border-outline/20">
+      <nav class="p-3 space-y-0.5">
+        <a href="home.html" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-medium text-sm transition-colors">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>仪表盘
+        </a>
+        <a href="new-assessment.html" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-medium text-sm transition-colors">
+          <i data-lucide="file-plus" class="w-4 h-4"></i>新建评估
+        </a>
+        <a href="history.html" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-medium text-sm transition-colors">
+          <i data-lucide="history" class="w-4 h-4"></i>评估历史
+        </a>
+        <a href="detail.html" class="flex items-center gap-3 px-3 py-2.5 rounded-md bg-primary text-on-primary font-medium text-sm" aria-current="page">
+          <i data-lucide="file-search" class="w-4 h-4"></i>评估详情
+        </a>
+      </nav>
+    </aside>
+
+    <!-- @main-content:start -->
+    <main class="flex-1 min-w-0 overflow-y-auto bg-background p-6">
+      <div class="max-w-4xl mx-auto">
+
+        <!-- 页面标题区域 -->
+        <div class="mb-8">
+          <h1 class="font-serif text-3xl font-bold tracking-tight text-on-surface">Assessment Report</h1>
+          <div class="flex items-center gap-4 mt-3">
+            <span class="text-sm text-on-surface-variant font-mono">#RA-2024-0087</span>
+            <span class="w-px h-4 bg-outline"></span>
+            <span class="text-sm text-on-surface-variant">Assessed on January 15, 2025 at 14:32 UTC</span>
+          </div>
+        </div>
+
+        <!-- 决策结果区域（最醒目） -->
+        <div id="decision-result" class="bg-primary text-on-primary rounded-lg p-8 mb-8 shadow-float">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-full bg-on-primary/15 flex items-center justify-center shrink-0 mt-0.5">
+              <i data-lucide="alert-triangle" class="w-6 h-6 text-on-primary"></i>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-sm text-xs font-semibold bg-error text-on-primary uppercase tracking-wider">Escalated</span>
+                <span class="text-xs text-on-primary/60">Decision rendered in 2.3s</span>
+              </div>
+              <h2 class="font-serif text-2xl font-bold mb-3">Escalated to PR Department</h2>
+              <p class="text-sm text-on-primary/80 leading-relaxed max-w-2xl">
+                This visit request has been flagged for mandatory PR Department review due to the combination of an international press outlet visiting with a technically specific interview request regarding content moderation algorithms. The overall risk score of 7.0/10 exceeds the auto-approval threshold.
+              </p>
+              <div class="flex items-center gap-6 mt-4 text-xs text-on-primary/60">
+                <span class="flex items-center gap-1.5">
+                  <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                  Decision Time: Jan 15, 2025 14:32 UTC
+                </span>
+                <span class="flex items-center gap-1.5">
+                  <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+                  Policy: Auto-escalation rule triggered
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 来访信息回顾区域 -->
+        <div id="visit-info-section" class="bg-surface rounded-lg shadow-card p-6 mb-6">
+          <div class="flex items-center gap-2 mb-5">
+            <i data-lucide="users" class="w-4.5 h-4.5 text-on-surface-variant"></i>
+            <h3 class="font-serif text-lg font-semibold text-on-surface">Visit Information</h3>
+          </div>
+          <div class="grid grid-cols-2 gap-x-8 gap-y-5">
+            <!-- 来访信息-邀请业务单元 -->
+            <div>
+              <span class="text-xs font-medium text-on-surface-variant uppercase tracking-wider block mb-1">Inviting Business Unit</span>
+              <span class="text-sm font-medium text-on-surface">ByteDance International</span>
+            </div>
+            <!-- 来访信息-来访组织 -->
+            <div>
+              <span class="text-xs font-medium text-on-surface-variant uppercase tracking-wider block mb-1">Visiting Organization</span>
+              <span class="text-sm font-medium text-on-surface">Reuters</span>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-warning/15 text-warning ml-2">International Press Outlet</span>
+            </div>
+            <!-- 来访信息-来访人员 -->
+            <div>
+              <span class="text-xs font-medium text-on-surface-variant uppercase tracking-wider block mb-1">Visiting Personnel</span>
+              <span class="text-sm font-medium text-on-surface">John Smith</span>
+              <span class="text-sm text-on-surface-variant ml-1">— Senior Correspondent</span>
+            </div>
+            <!-- 来访信息-来访目的 -->
+            <div class="col-span-2">
+              <span class="text-xs font-medium text-on-surface-variant uppercase tracking-wider block mb-1">Visit Purpose</span>
+              <p class="text-sm text-on-surface leading-relaxed bg-surface-container rounded-md px-4 py-3">
+                "Request for tour of ByteDance's AI research labs and interview with technical leads regarding content moderation algorithms"
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 多维度风险评分详情区域 -->
+        <div id="risk-scores-section" class="bg-surface rounded-lg shadow-card p-6 mb-6">
+          <div class="flex items-center gap-2 mb-5">
+            <i data-lucide="bar-chart-3" class="w-4.5 h-4.5 text-on-surface-variant"></i>
+            <h3 class="font-serif text-lg font-semibold text-on-surface">Risk Score Breakdown</h3>
+          </div>
+
+          <div class="space-y-5">
+            <!-- 评分维度-Organization Sensitivity -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-on-surface">Organization Sensitivity</span>
+                <span class="text-sm font-bold text-on-surface font-mono">8<span class="text-on-surface-variant font-normal">/10</span></span>
+              </div>
+              <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+                <div class="h-full bg-error rounded-full" style="width: 80%"></div>
+              </div>
+              <span class="text-xs text-on-surface-variant mt-1 block">International Press Outlet — High Scrutiny</span>
+            </div>
+
+            <!-- 评分维度-Business Unit Sensitivity -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-on-surface">Business Unit Sensitivity</span>
+                <span class="text-sm font-bold text-on-surface font-mono">6<span class="text-on-surface-variant font-normal">/10</span></span>
+              </div>
+              <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+                <div class="h-full bg-warning rounded-full" style="width: 60%"></div>
+              </div>
+              <span class="text-xs text-on-surface-variant mt-1 block">International — Moderate</span>
+            </div>
+
+            <!-- 评分维度-Visit Purpose Specificity -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-on-surface">Visit Purpose Specificity</span>
+                <span class="text-sm font-bold text-on-surface font-mono">7<span class="text-on-surface-variant font-normal">/10</span></span>
+              </div>
+              <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+                <div class="h-full bg-warning rounded-full" style="width: 70%"></div>
+              </div>
+              <span class="text-xs text-on-surface-variant mt-1 block">Technical interview request — Elevated</span>
+            </div>
+          </div>
+
+          <!-- 综合评分 -->
+          <div class="mt-6 pt-5 border-t border-outline/30">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-sm font-semibold text-on-surface">Overall Risk Score</span>
+                <span class="text-xs text-on-surface-variant ml-2">Weighted average across all dimensions</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-32 h-3 bg-surface-container rounded-full overflow-hidden">
+                  <div class="h-full bg-error rounded-full" style="width: 70%"></div>
+                </div>
+                <span class="text-2xl font-bold font-mono text-error">7.0<span class="text-sm text-on-surface-variant font-normal">/10</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 政策引用区域 -->
+        <div id="policy-references-section" class="bg-surface rounded-lg shadow-card p-6 mb-6">
+          <div class="flex items-center gap-2 mb-5">
+            <i data-lucide="scale" class="w-4.5 h-4.5 text-on-surface-variant"></i>
+            <h3 class="font-serif text-lg font-semibold text-on-surface">Referenced Compliance Policies</h3>
+          </div>
+
+          <div class="space-y-4">
+            <!-- 政策引用-条款1 -->
+            <div class="border-l-2 border-primary pl-5 py-2">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="text-xs font-mono font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-sm">§4.2.1</span>
+                <span class="text-xs text-on-surface-variant">Media & Press Relations Protocol</span>
+              </div>
+              <p class="text-sm text-on-surface leading-relaxed">
+                All visit requests from internationally recognized press organizations must be reviewed by the Public Relations Department prior to approval. This applies regardless of the stated purpose of the visit.
+              </p>
+            </div>
+
+            <!-- 政策引用-条款2 -->
+            <div class="border-l-2 border-primary pl-5 py-2">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="text-xs font-mono font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-sm">§7.1.3</span>
+                <span class="text-xs text-on-surface-variant">AI Research Lab Access Control</span>
+              </div>
+              <p class="text-sm text-on-surface leading-relaxed">
+                Access to AI research facilities by external parties requires explicit approval from both the research division head and the legal compliance team. Interviews concerning content moderation algorithms are classified as sensitive technical disclosures.
+              </p>
+            </div>
+
+            <!-- 政策引用-条款3 -->
+            <div class="border-l-2 border-primary pl-5 py-2">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="text-xs font-mono font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-sm">§3.5.2</span>
+                <span class="text-xs text-on-surface-variant">International Business Unit Visitor Guidelines</span>
+              </div>
+              <p class="text-sm text-on-surface leading-relaxed">
+                International business units hosting visitors from foreign media organizations must ensure that a PR liaison is present throughout the visit. Technical interviews require pre-approved talking points and a designated spokesperson.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 升级详情区域 -->
+        <div id="escalation-details-section" class="bg-surface rounded-lg shadow-card p-6 mb-8">
+          <div class="flex items-center gap-2 mb-5">
+            <i data-lucide="send" class="w-4.5 h-4.5 text-on-surface-variant"></i>
+            <h3 class="font-serif text-lg font-semibold text-on-surface">Escalation Notification</h3>
+          </div>
+
+          <div class="bg-surface-container rounded-md p-5">
+            <div class="grid grid-cols-2 gap-x-8 gap-y-4 mb-4">
+              <!-- 升级详情-接收人 -->
+              <div>
+                <span class="text-xs font-medium text-on-surface-variant uppercase tracking-wider block mb-1">Recipient</span>
+                <span class="text-sm font-medium text-on-surface">PR Department — Media Relations Team</span>
+              </div>
+              <!-- 升级详情-发送时间 -->
+              <div>
+                <span class="text-xs font-medium text-on-surface-variant uppercase tracking-wider block mb-1">Sent At</span>
+                <span class="text-sm font-medium text-on-surface">January 15, 2025, 14:32 UTC</span>
+              </div>
+              <!-- 升级详情-通知渠道 -->
+              <div>
+                <span class="text-xs font-medium text-on-surface-variant uppercase tracking-wider block mb-1">Channel</span>
+                <span class="text-sm font-medium text-on-surface">Email + Internal System Alert</span>
+              </div>
+              <!-- 升级详情-状态 -->
+              <div>
+                <span class="text-xs font-medium text-on-surface-variant uppercase tracking-wider block mb-1">Status</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-warning/15 text-warning">Pending Review</span>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-outline/30">
+              <span class="text-xs font-medium text-on-surface-variant uppercase tracking-wider block mb-2">Notification Summary</span>
+              <p class="text-sm text-on-surface leading-relaxed">
+                Automated escalation notification sent regarding visit request #RA-2024-0087. Reuters (International Press Outlet) has requested a tour of ByteDance's AI research labs and an interview with technical leads on content moderation algorithms. The assessment yielded an overall risk score of 7.0/10, triggering mandatory PR review per policy §4.2.1. Awaiting PR Department decision on whether to approve, modify, or deny the request.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 底部操作按钮 -->
+        <div id="action-buttons" class="flex items-center gap-3 pb-8">
+          <button id="btn-back-history" class="bg-surface-container text-on-surface border-none px-5 py-2.5 rounded-md text-sm font-medium hover:bg-surface-container-high active:scale-[0.98] transition-all inline-flex items-center gap-2">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            Back to History
+          </button>
+          <button id="btn-export-report" class="bg-primary text-on-primary px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-90 active:scale-[0.98] transition-all inline-flex items-center gap-2">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            Export Report
+          </button>
+        </div>
+
+      </div>
+    </main>
+    <!-- @main-content:end -->
+  </div>
+  <!-- @nav:end 导航组件，不需要的页面则不要复制此段 -->
+
+  <script>
+    $(function() {
+      // 返回评估历史页面
+      $('#btn-back-history').on('click', function() {
+        window.location.href = 'history.html';
+      });
+
+      // 导出报告 - 打印当前页面为PDF
+      $('#btn-export-report').on('click', function() {
+        window.print();
+      });
+    });
+  </script>
+
+  <script>lucide.createIcons();</script>
+</body>
+
+</html>
