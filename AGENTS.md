@@ -1,65 +1,84 @@
-# 项目上下文
+# AGENTS.md
 
-### 版本技术栈
+## 项目概览
+
+AI-Powered Risk Assessment Agent — 国际客户来访风险评估系统 Demo。
+
+模拟字节跳动内部的 AI 驱动来访风险评估代理，核心流程：结构化输入 → 自动匹配 SOP 政策 → 多维度风险评分 → 条件决策（自动放行 / 升级至 PR 部门）。
+
+## 技术栈
 
 - **Framework**: Next.js 16 (App Router)
-- **Core**: React 19
-- **Language**: TypeScript 5
-- **UI 组件**: shadcn/ui (基于 Radix UI)
-- **Styling**: Tailwind CSS 4
+- **Core**: React 19 + TypeScript 5
+- **UI**: shadcn/ui + Tailwind CSS 4
+- **Styling**: 杂志风设计系统（Playfair Display serif + 温暖纸张色阶）
 
 ## 目录结构
 
 ```
-├── public/                 # 静态资源
-├── scripts/                # 构建与启动脚本
-│   ├── build.sh            # 构建脚本
-│   ├── dev.sh              # 开发环境启动脚本
-│   ├── prepare.sh          # 预处理脚本
-│   └── start.sh            # 生产环境启动脚本
-├── src/
-│   ├── app/                # 页面路由与布局
-│   ├── components/ui/      # Shadcn UI 组件库
-│   ├── hooks/              # 自定义 Hooks
-│   ├── lib/                # 工具库
-│   │   └── utils.ts        # 通用工具函数 (cn)
-│   └── server.ts           # 自定义服务端入口
-├── next.config.ts          # Next.js 配置
-├── package.json            # 项目依赖管理
-└── tsconfig.json           # TypeScript 配置
+src/
+├── app/
+│   ├── page.tsx                    # 仪表盘（首页）
+│   ├── layout.tsx                  # 根布局
+│   ├── globals.css                 # 设计变量（杂志风 token）
+│   ├── new-assessment/page.tsx     # 新建评估页
+│   ├── history/page.tsx            # 评估历史页
+│   ├── detail/[id]/page.tsx        # 评估详情页
+│   └── api/
+│       ├── assess/route.ts         # POST 提交评估
+│       ├── assessments/route.ts    # GET 查询评估列表/详情
+│       ├── dashboard/route.ts      # GET 仪表盘统计
+│       └── sop/route.ts            # GET SOP 文档列表
+├── components/
+│   ├── layout.tsx                  # Header + Sidebar 组件
+│   └── ui/                         # shadcn/ui 组件
+└── lib/
+    ├── assessment-engine.ts        # 核心评估引擎（评分+决策逻辑）
+    ├── mock-data.ts                # 模拟数据存储（10条历史记录）
+    └── sop/
+        └── policies.ts             # SOP 合规政策参考文档（6份）
 ```
 
-- 项目文件（如 app 目录、pages 目录、components 等）默认初始化到 `src/` 目录下。
+## 核心业务逻辑
 
-## 包管理规范
+### 评估引擎 (`lib/assessment-engine.ts`)
 
-**仅允许使用 pnpm** 作为包管理器，**严禁使用 npm 或 yarn**。
-**常用命令**：
-- 安装依赖：`pnpm add <package>`
-- 安装开发依赖：`pnpm add -D <package>`
-- 安装所有依赖：`pnpm install`
-- 移除依赖：`pnpm remove <package>`
+1. **组织敏感度评分** (权重 40%): 根据组织类型分级（Tier 1-3）
+2. **业务单元敏感度评分** (权重 30%): 根据部门分类（高/中/低敏感度）
+3. **来访目的评分** (权重 30%): 基于关键词匹配评估目的风险
+4. **综合评分**: 加权平均，0-10 分
+5. **决策逻辑**:
+   - 综合分 > 6.5 → Escalated（升级至 PR）
+   - 任一维度 >= 8 → Escalated
+   - Tier 1 组织 + 高风险目的 → Escalated
+   - 其余 → Cleared（自动放行）
 
-## 开发规范
+### SOP 政策文档 (`lib/sop/policies.ts`)
 
-### 编码规范
+模拟飞书云文档中的 6 份内部合规政策：
+- SOP-001: International Visitor Management Policy
+- SOP-002: Organization Sensitivity Classification
+- SOP-003: Business Unit Sensitivity Matrix
+- SOP-004: Visit Purpose Assessment Guidelines
+- SOP-005: Escalation Protocol & PR Notification
+- SOP-006: Audit & Record-Keeping Requirements
 
-- 默认按 TypeScript `strict` 心智写代码；优先复用当前作用域已声明的变量、函数、类型和导入，禁止引用未声明标识符或拼错变量名。
-- 禁止隐式 `any` 和 `as any`；函数参数、返回值、解构项、事件对象、`catch` 错误在使用前应有明确类型或先完成类型收窄，并清理未使用的变量和导入。
+评估引擎会根据输入自动检索相关条款，作为决策依据。
 
-### next.config 配置规范
+## API 接口
 
-- 配置的路径不要写死绝对路径，必须使用 path.resolve(__dirname, ...)、import.meta.dirname 或 process.cwd() 动态拼接。
+| 方法 | 路径 | 功能 |
+|------|------|------|
+| POST | /api/assess | 提交来访评估请求，返回评分和决策 |
+| GET | /api/assessments | 获取所有评估历史（?id= 查单条） |
+| GET | /api/dashboard | 获取仪表盘统计和最近评估 |
+| GET | /api/sop | 获取 SOP 文档列表 |
 
-### Hydration 问题防范
+## 构建命令
 
-1. 严禁在 JSX 渲染逻辑中直接使用 typeof window、Date.now()、Math.random() 等动态数据。**必须使用 'use client' 并配合 useEffect + useState 确保动态内容仅在客户端挂载后渲染**；同时严禁非法 HTML 嵌套（如 <p> 嵌套 <div>）。
-2. **禁止使用 head 标签**，优先使用 metadata，详见文档：https://nextjs.org/docs/app/api-reference/functions/generate-metadata
-   1. 三方 CSS、字体等资源可在 `globals.css` 中顶部通过 `@import` 引入或使用 next/font
-   2. preload, preconnect, dns-prefetch 通过 ReactDOM 的 preload、preconnect、dns-prefetch 方法引入
-   3. json-ld 可阅读 https://nextjs.org/docs/app/guides/json-ld
-
-## UI 设计与组件规范 (UI & Styling Standards)
-
-- 模板默认预装核心组件库 `shadcn/ui`，位于`src/components/ui/`目录下
-- Next.js 项目**必须默认**采用 shadcn/ui 组件、风格和规范，**除非用户指定用其他的组件和规范。**
+```bash
+pnpm install        # 安装依赖
+pnpm dev            # 开发环境
+pnpm build          # 生产构建
+pnpm start          # 生产启动
+```
