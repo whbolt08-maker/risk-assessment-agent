@@ -8,6 +8,7 @@ import {
   History,
   FileSearch,
   ShieldCheck,
+  BookOpen,
 } from "lucide-react";
 
 const navItems = [
@@ -15,6 +16,7 @@ const navItems = [
   { href: "/new-assessment", label: "New Assessment", icon: FilePlus },
   { href: "/history", label: "History", icon: History },
   { href: "/detail/RA-2024-0087", label: "Detail", icon: FileSearch },
+  { href: "/sop", label: "SOP Documents", icon: BookOpen },
 ];
 
 export function Sidebar() {
