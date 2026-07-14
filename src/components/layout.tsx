@@ -61,9 +61,9 @@ export function Header() {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
-            初
+            赫
           </div>
-          <span className="text-sm text-muted-foreground">小初</span>
+          <span className="text-sm text-muted-foreground">小赫</span>
         </div>
       </div>
     </header>
